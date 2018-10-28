@@ -3,18 +3,17 @@ package maas;
 import java.util.List;
 import java.util.Vector;
 import maas.tutorials.BookBuyerAgent;
-import maas.tutorials.BookSellerAgent;
 import maas.tutorials.Books;
 
 public class Start {
     public static void main(String[] args) {
-    	
-    	List<String> bookNames = Books.getBookList();
+    	    	List<String> bookNames = Books.getBookList();
     	
     	// Change the buyer agents here
     	final int numberOfBuyerAgents = 20;
     	
-    	
+    	//Required for shutting down correctly
+    	BookBuyerAgent.numberOfAgents = numberOfBuyerAgents;
     	final int numberOfSellerAgents = 4;
     	
     	List<String> buyAgents = new Vector<>();

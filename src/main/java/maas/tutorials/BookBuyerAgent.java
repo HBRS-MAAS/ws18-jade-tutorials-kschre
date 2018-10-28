@@ -22,12 +22,16 @@ public class BookBuyerAgent extends Agent {
 	private String targetBookTitle;
 	private AID[] sellerAgents;
 	
+	//Counting agents to shut down when all are finished
+	public static int numberOfAgents = 0;
+	private static int finishedAgents = 0;
+	
 	protected void setup() {
 		// Printout a welcome message
 		System.out.println(getAID().getLocalName() + ": Hello! Buyer-agent  is ready.");
 
 		try {
-			Thread.sleep(3000);
+			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			// e.printStackTrace();
 		}
@@ -40,7 +44,7 @@ public class BookBuyerAgent extends Agent {
 			System.out.println(getAID().getLocalName() + ": Trying to buy " + targetBookTitle);
 
 			// Adding behavior
-			addBehaviour(new TickerBehaviour(this, 5000) {
+			addBehaviour(new TickerBehaviour(this, 2000) {
 				protected void onTick() {
 					// Update the list of seller agents
 					DFAgentDescription template = new DFAgentDescription();
@@ -65,7 +69,7 @@ public class BookBuyerAgent extends Agent {
 			doDelete();
 		}
 
-//		addBehaviour(new shutdown());
+		//addBehaviour(new shutdown());
 	}
 
 	protected void takeDown() {
@@ -75,7 +79,7 @@ public class BookBuyerAgent extends Agent {
 	// Taken from
 	// http://www.rickyvanrijn.nl/2017/08/29/how-to-shutdown-jade-agent-platform-programmatically/
 	private class shutdown extends OneShotBehaviour {
-		public void action() {
+		public void action() {			
 			ACLMessage shutdownMessage = new ACLMessage(ACLMessage.REQUEST);
 			Codec codec = new SLCodec();
 			myAgent.getContentManager().registerLanguage(codec);
@@ -167,7 +171,7 @@ public class BookBuyerAgent extends Agent {
 					if (reply.getPerformative() == ACLMessage.INFORM) {
 						// Purchase successful. We can terminate
 						System.out.println(getAID().getLocalName() + ": "+ targetBookTitle + " successfully purchased. Price = " + bestPrice);
-						myAgent.doDelete();
+						//myAgent.doDelete();
 					}
 					step = 4;
 				} else {
@@ -178,6 +182,15 @@ public class BookBuyerAgent extends Agent {
 		}
 
 		public boolean done() {
+			//When it is finished
+			if (step == 4) {
+				BookBuyerAgent.finishedAgents += 1;
+				
+				//If everyone is finished, shutdown
+				if (BookBuyerAgent.finishedAgents == BookBuyerAgent.numberOfAgents) {
+					myAgent.addBehaviour(new shutdown());
+				}
+			}
 			return ((step == 2 && bestSeller == null) || step == 4);
 		}
 	} // End of inner class RequestPerformer

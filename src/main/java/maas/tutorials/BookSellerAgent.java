@@ -83,7 +83,7 @@ public class BookSellerAgent extends Agent {
 	public void updateCatalogue(final String title, final int price) {
 		addBehaviour(new OneShotBehaviour() {
 			public void action() {
-				catalogue.put(title, new Integer(price));
+				catalogue.put(title, Integer.valueOf(price));
 			}
 		});
 	}
